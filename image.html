@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Autoplay Image Slider</title>
+  <!-- Include Bootstrap CSS for basic styling (optional) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .slider {
+      width: 100%;
+      max-width: 600px;
+      margin: auto;
+      position: relative;
+    }
+    .slider img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .controls {
+      position: absolute;
+      top: 50%;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      transform: translateY(-50%);
+    }
+    .controls button {
+      background: rgba(0,0,0,0.5);
+      color: #fff;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="app" class="container mt-5">
+    <h2 class="mb-4">Autoplay Image Slider</h2>
+
+    <!-- Image slider container -->
+    <div class="slider">
+      <!-- Image to be displayed -->
+      <img :src="images[currentIndex]" alt="Image Slider">
+      
+      <!-- Navigation controls -->
+      <div class="controls">
+        <button @click="prevImage">&lt;</button>
+        <button @click="nextImage">&gt;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Include Vue.js via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        currentIndex: 0,  // Index of the current image
+        images: [
+          'https://via.placeholder.com/600x400?text=Image+1',
+          'https://via.placeholder.com/600x400?text=Image+2',
+          'https://via.placeholder.com/600x400?text=Image+3'
+        ],  // Array of image URLs
+        autoplayInterval: null  // To hold the interval ID
+      },
+      methods: {
+        // Show the previous image
+        prevImage() {
+          this.currentIndex = (this.currentIndex - 1 + this.images.length) % this.images.length;
+        },
+        // Show the next image
+        nextImage() {
+          this.currentIndex = (this.currentIndex + 1) % this.images.length;
+        },
+        // Start autoplay
+        startAutoplay() {
+          this.autoplayInterval = setInterval(this.nextImage, 3000); // Change image every 3 seconds
+        },
+        // Stop autoplay
+        stopAutoplay() {
+          clearInterval(this.autoplayInterval);
+        }
+      },
+      mounted() {
+        // Start autoplay when the component is mounted
+        this.startAutoplay();
+      },
+      beforeDestroy() {
+        // Stop autoplay when the component is destroyed
+        this.stopAutoplay();
+      }
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Search Filter</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+  <div id="app" class="container mt-5">
+    <h2 class="mb-4">Live Search</h2>
+
+    <!-- Search input bound to query -->
+    <input v-model="query" type="text" class="form-control" placeholder="Search fruits...">
+
+    <!-- Filtered list based on the query -->
+    <ul class="list-group mt-3">
+      <li v-for="fruit in filteredFruits" :key="fruit" class="list-group-item">
+        {{ fruit }}
+      </li>
+    </ul>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        query: '',
+        fruits: ['Apple', 'Banana', 'Mango', 'Orange', 'Pineapple', 'Strawberry']
+      },
+      computed: {
+        filteredFruits() {
+          return this.fruits.filter(fruit => fruit.toLowerCase().includes(this.query.toLowerCase()));
+        }
+      }
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,15 @@
+<div id="app">
+  <input type="checkbox" v-model="checked"> I agree
+  <p>Checkbox is: {{ checked }}</p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+
+<script>
+  new Vue({
+    el: '#app',
+    data: {
+      checked: false // Initially unchecked
+    }
+  });
+</script>

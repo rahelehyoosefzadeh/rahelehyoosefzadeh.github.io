@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Slider</title>
+  <!-- Include Bootstrap CSS for basic styling (optional) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+  <div id="app" class="container mt-5">
+    <h2 class="mb-4">Simple Slider</h2>
+
+    <!-- Slider bound to the value data property -->
+    <input type="range" v-model="sliderValue" min="0" max="100" class="form-range">
+
+    <!-- Display the current value of the slider -->
+    <p class="mt-3">Slider Value: <strong>{{ sliderValue }}</strong></p>
+  </div>
+
+  <!-- Include Vue.js via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+
+  <script>
+    // Create a new Vue instance
+    new Vue({
+      el: '#app',
+      data: {
+        sliderValue: 50 // Default value of the slider
+      }
+    });
+  </script>
+
+</body>
+</html>

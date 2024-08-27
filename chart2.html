@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue.js Carousel with Semi-Circle Doughnut Charts</title>
+    <style>
+        #app{
+            width: 400px;
+        }
+        .carousel {
+            display: flex;
+            overflow: hidden;
+            position: relative;
+            width: 100%;
+            height: 300px; /* Adjust height as needed */
+        }
+        .carousel-inner {
+            display: flex;
+            transition: transform 0.5s ease;
+            width: 100%;
+        }
+        .carousel-item {
+            min-width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            position: relative;
+        }
+        .carousel-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            z-index: 10;
+        }
+        .carousel-button.prev {
+            left: 0;
+        }
+        .carousel-button.next {
+            right: 0;
+        }
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 1px solid #ccc;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            z-index: 100;
+            display: none;
+        }
+        .modal.show {
+            display: block;
+        }
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
+        .clickable-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.1); /* Slightly dark overlay */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item" v-for="(chart, index) in charts" :key="index"
+                     @mouseover="showHoverModal(index)" @mouseleave="hideHoverModal">
+                    <!-- Chart rendering code here -->
+                    <canvas :id="'chart-' + index" width="400" height="300"></canvas>
+                    <div class="clickable-overlay" @click="showClickModal(index)">
+                        Click for more details
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-button prev" @click="prevSlide">‹</button>
+            <button class="carousel-button next" @click="nextSlide">›</button>
+        </div>
+        <div class="modal" :class="{ show: isHoverModalVisible }">
+            <span class="modal-close" @click="isHoverModalVisible = false">×</span>
+            <div v-if="currentHoverChartIndex !== null">
+                <h2>Chart Details</h2>
+                <p><strong>Percentage:</strong> {{ charts[currentHoverChartIndex].data }}%</p>
+            </div>
+        </div>
+        <div class="modal" :class="{ show: isClickModalVisible }">
+            <span class="modal-close" @click="closeClickModal">×</span>
+            <div v-if="currentClickChartIndex !== null">
+                <h2>Detailed Information</h2>
+                <p><strong>Percentage:</strong> {{ charts[currentClickChartIndex].data }}%</p>
+                <!-- Add more detailed information as needed -->
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js"></script>
+    <script>
+        Chart.register(ChartDataLabels); // Register the plugin with Chart.js
+
+        new Vue({
+            el: '#app',
+            data() {
+                return {
+                    charts: [
+                        { data: 10 },
+                        { data: 20 },
+                        { data: 30 },
+                        { data: 40 },
+                        { data: 50 },
+                        { data: 60 },
+                        { data: 70 },
+                        { data: 80 },
+                        { data: 90 },
+                        { data: 100 }
+                    ],
+                    currentIndex: 0,
+                    isHoverModalVisible: false,
+                    isClickModalVisible: false,
+                    currentHoverChartIndex: null,
+                    currentClickChartIndex: null
+                };
+            },
+            mounted() {
+                this.$nextTick(() => {
+                    this.renderCharts();
+                });
+            },
+            methods: {
+                renderCharts() {
+                    this.charts.forEach((chart, index) => {
+                        new Chart(document.getElementById('chart-' + index), {
+                            type: 'doughnut',
+                            data: {
+                                labels: ['Percentage'],
+                                datasets: [{
+                                    data: [chart.data, 100 - chart.data],
+                                    backgroundColor: ['#4CAF50', '#D3D3D3'], // Green for percentage, gray for the rest
+                                    borderWidth: 0
+                                }]
+                            },
+                            options: {
+                                cutoutPercentage: 80, // Makes the donut more pronounced
+                                circumference: 180, // Half-circle
+                                rotation: -90, // Rotates the chart to start from the left
+                                elements: {
+                                    arc: {
+                                        borderWidth: 0 // Removes border
+                                    }
+                                },
+                                tooltips: {
+                                    enabled: false // Disables tooltip
+                                },
+                                legend: {
+                                    display: false // Hides legend
+                                }
+                            }
+                        });
+                    });
+                },
+                prevSlide() {
+                    if (this.currentIndex > 0) {
+                        this.currentIndex--;
+                    } else {
+                        this.currentIndex = this.charts.length - 1;
+                    }
+                    this.updateCarousel();
+                },
+                nextSlide() {
+                    if (this.currentIndex < this.charts.length - 1) {
+                        this.currentIndex++;
+                    } else {
+                        this.currentIndex = 0;
+                    }
+                    this.updateCarousel();
+                },
+                updateCarousel() {
+                    const carouselInner = document.querySelector('.carousel-inner');
+                    carouselInner.style.transform = `translateX(-${this.currentIndex * 100}%)`;
+                    this.closeClickModal(); // Close the clickable modal when changing slides
+                },
+                showHoverModal(index) {
+                    this.currentHoverChartIndex = index;
+                    this.isHoverModalVisible = true;
+                },
+                hideHoverModal() {
+                    this.isHoverModalVisible = false;
+                },
+                showClickModal(index) {
+                    this.currentClickChartIndex = index;
+                    this.isClickModalVisible = true;
+                },
+                closeClickModal() {
+                    this.isClickModalVisible = false;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
