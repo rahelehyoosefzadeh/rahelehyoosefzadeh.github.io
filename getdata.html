@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vue Data Fetch Example</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <style>
+    /* Add some basic styling */
+    body { font-family: Arial, sans-serif; }
+    ul { list-style-type: none; padding: 0; }
+    li { margin: 5px 0; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <h1>Data from Server</h1>
+    <p v-if="loading">Loading...</p>
+    <p v-if="error">{{ error }}</p>
+    <ul v-if="data">
+      <li v-for="item in data" :key="item.id">{{ item.email }}</li>
+    </ul>
+  </div>
+
+  <script>
+    new Vue({
+      el: '#app',
+      data() {
+        return {
+          data: null,
+          error: null,
+          loading: true,
+        };
+      },
+      created() {
+        axios.get('https://fakestoreapi.com/users')
+          .then(response => {
+            this.data = response.data;
+          })
+          .catch(err => {
+            this.error = 'Failed to fetch data';
+          })
+          .finally(() => {
+            this.loading = false;
+          });
+      },
+    });
+  </script>
+</body>
+</html>
